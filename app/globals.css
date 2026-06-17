@@ -1,6 +1,6 @@
 *  { box-sizing: border-box; margin: 0; padding: 0; }
 /* scroll-behavior: smooth removed — lenis owns scrolling (see Architecture_decisions_phase_1.md) */
-/* DARK PREVIEW colors below — original LIGHT values documented in CLAUDE.md (revert unless approved) */
+/* Theme colors (warm/purple dark) */
 body { background: #16131D; }
 
 /* Scroll-triggered reveal animation */

@@ -9,7 +9,7 @@ import Journey from "./Journey"
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 
-// ── DARK PREVIEW (throwaway palette — original LIGHT values live in CLAUDE.md; revert unless approved) ──
+// ── Theme tokens (warm/purple dark) ──
 const C = {
   bg:          "#16131D",
   surface:     "#1E1A28",
