@@ -1,0 +1,61 @@
+*  { box-sizing: border-box; margin: 0; padding: 0; }
+/* scroll-behavior: smooth removed — lenis owns scrolling (see Architecture_decisions_phase_1.md) */
+/* DARK PREVIEW colors below — original LIGHT values documented in CLAUDE.md (revert unless approved) */
+body { background: #16131D; }
+
+/* Scroll-triggered reveal animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Project card hover */
+.pcard { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.pcard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+}
+
+/* Nav links */
+.navlink { transition: color 0.2s; }
+.navlink:hover { color: #8AA9D6 !important; }
+
+/* Framework table row hover */
+.fwrow td { transition: background 0.15s; }
+.fwrow:hover td { background: rgba(138, 169, 214, 0.06); }
+
+/* HITL stamp — the signature element */
+.hitl {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border: 1.5px solid rgba(216, 163, 110, 0.45);
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #D8A36E;
+  background: rgba(216, 163, 110, 0.10);
+  transform: rotate(-0.7deg);
+}
+
+/* Ghost button */
+.ghostbtn { transition: border-color 0.2s, color 0.2s; }
+.ghostbtn:hover { border-color: #8AA9D6 !important; color: #8AA9D6 !important; }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .pgrid    { grid-template-columns: 1fr !important; }
+  .expgrid  { grid-template-columns: 1fr !important; }
+  .statsrow { flex-direction: column !important; gap: 1.75rem !important; }
+  .heroname { font-size: 2.75rem !important; }
+  .navlinks { display: none !important; }
+  .fwtablewrap { overflow-x: auto; }
+}
