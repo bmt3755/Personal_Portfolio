@@ -50,6 +50,12 @@ body { background: #16131D; }
 .ghostbtn { transition: border-color 0.2s, color 0.2s; }
 .ghostbtn:hover { border-color: #8AA9D6 !important; color: #8AA9D6 !important; }
 
+/* Dossier "Technical detail" pulse — draws the eye to the expander */
+@keyframes dossierPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .pgrid    { grid-template-columns: 1fr !important; }

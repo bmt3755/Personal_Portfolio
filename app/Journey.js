@@ -1,6 +1,7 @@
 "use client"
 import { useRef, useState, useEffect } from "react"
-import { motion, useScroll, useTransform, useMotionTemplate, useReducedMotion } from "framer-motion"
+import { motion, useScroll, useTransform, useMotionTemplate, useReducedMotion, useMotionValueEvent } from "framer-motion"
+import Dossier from "./Dossier"
 
 // ─── Phase 0: grid-hub dive engine (Option A) ───────────────────────────────────
 // Desk → dive into the monitor → the screen becomes a 3×2 GRID of project tiles.
@@ -18,8 +19,26 @@ const D = {
   navy: "#7FA8D4", stamp: "#D6A271", border: "#332D24",
 }
 
+// Full dossier content for Case File 01 (the vertical slice). Others get the short overlay until built.
+const CO_DOSSIER = {
+  subtitle: "LangGraph workflow · human approval built in",
+  stakes: "On big construction jobs, change orders are where money gets lost and fights start. Each one takes hours to review by hand, and a single misplaced approval can turn into an expensive legal dispute. This build handles one start to finish: it reads the change order, checks it against the contract, estimates the cost, decides if it's in scope, and routes it to the right person to approve.",
+  decision: "The hard part: it has to pause for a human to approve, then resume exactly where it left off — a basic script can't do that. Built on LangGraph, it saves its progress as it goes, so it survives the wait (or a crash) and picks back up. And when it isn't sure, it stops and asks a person instead of guessing.",
+  stamp: "A person approves before any escalation email sends",
+  hitlNote: "The system does all the work, then stops — the email sits as a draft until a human says yes (or rejects it).",
+  proof: "20 automated tests pass — including 2 that run the whole thing end to end.",
+  tech: ["Python", "LangGraph", "SQLite", "ChromaDB", "Pydantic", "LangSmith"],
+  source: "https://github.com/bmt3755/change-order-agent",
+  technical: [
+    ["Pattern", "Fixed LangGraph workflow: read → (check contract + estimate cost in parallel) → scope ruling → confidence gate → route → (assemble + audit in parallel) → pause for human approval."],
+    ["State", "Typed state (Pydantic). Progress is saved to SQLite under each order's ID, so it resumes exactly where it paused — even after a crash."],
+    ["Human gate", "Two checkpoints: a low-confidence gate that halts for a person, and an interrupt that pauses before completion for sign-off."],
+    ["Tests", "18 unit checks + 2 end-to-end runs against live OpenAI + ChromaDB."],
+  ],
+}
+
 const PROJECTS = [
-  { tag: "Construction / AEC",        title: "Change Order Management Agent",   body: "Supervisor · LangGraph — checkpoint persistence for a legal audit trail.", hitl: "PM approves before any escalation email sends",        tint: ["#1B2535", "#0F131B"], img: "/images/construction.png" },
+  { tag: "Construction / AEC",        title: "Change Order Management Agent",   body: "Supervisor · LangGraph — checkpoint persistence for a legal audit trail.", hitl: "PM approves before any escalation email sends",        tint: ["#1B2535", "#0F131B"], img: "/images/construction.png", dossier: CO_DOSSIER },
   { tag: "Insurance / FinTech",       title: "Insurance Claim Processing Agent", body: "Router · LangGraph — conditional routing to isolated specialists.",        hitl: "NEEDS_REVIEW (5–7) routes to a human adjuster",       tint: ["#15271F", "#0D1512"], img: "/images/insurance.png" },
   { tag: "Healthcare / MedTech",      title: "Patient Briefing System",          body: "Supervisor + Parallel — PHI redacted before the graph runs.",             hitl: "PHI never reaches an LLM",                            tint: ["#251B30", "#140F1A"], img: "/images/briefing.png" },
   { tag: "FinTech / Banking",         title: "Loan Default Risk Monitor",        body: "5 parallel risk dimensions — latency cut 5×.",                            hitl: "Banker decides: STABLE / WATCH / AT_RISK / CRITICAL", tint: ["#2A2017", "#15100A"], img: "/images/loan.png" },
@@ -132,22 +151,56 @@ function DetailOverlay({ progress, k, project, n }) {
   )
 }
 
+// Full case-file dossier overlay (project #1) — holds steady in focus and is interactive
+// (expander + source link). pointer-events only enabled while this project is in focus.
+function DossierOverlay({ progress, k, project, n }) {
+  const b = blockStart(k)
+  const opacity = useTransform(progress, [b + 0.02, b + 0.05, b + 0.085, b + 0.11], [0, 1, 1, 0])
+  const [inFocus, setInFocus] = useState(false)
+  useMotionValueEvent(progress, "change", (v) => {
+    const on = v >= b + 0.035 && v <= b + 0.10
+    setInFocus((prev) => (prev === on ? prev : on))
+  })
+  return (
+    <motion.div style={{
+      position: "absolute", inset: 0, opacity, display: "flex", alignItems: "center", justifyContent: "center",
+      background: "radial-gradient(120% 95% at 50% 50%, rgba(10,8,14,0.9) 0%, rgba(8,6,11,0.97) 100%)",
+      pointerEvents: "none",
+    }}>
+      <div style={{ pointerEvents: inFocus ? "auto" : "none", maxWidth: 680, width: "100%", padding: "3vh 2rem" }}>
+        <Dossier data={project.dossier} project={project} n={n} c={D} panel />
+      </div>
+    </motion.div>
+  )
+}
+
 // Static stacked gallery — reduced-motion + small screens. No scroll-jacking.
+// Real photo header; #1 shows the full dossier, the rest the short blurb (until built).
 function FlatFallback() {
   return (
     <section style={{ background: D.bg, padding: "4rem 1rem" }}>
-      {PROJECTS.map((p, i) => (
-        <div key={i} style={{ maxWidth: 760, margin: "0 auto 2.5rem", border: `1px solid ${D.border}`, borderRadius: 10, overflow: "hidden" }}>
-          <div style={{ height: "34vh", display: "flex", alignItems: "center", justifyContent: "center", background: `radial-gradient(120% 120% at 50% 45%, ${p.tint[0]} 0%, ${p.tint[1]} 75%)` }}>
-            <div style={{ fontFamily: "Fraunces, serif", fontWeight: 600, fontSize: "1.8rem", color: D.ink, textAlign: "center", padding: "0 1rem" }}>{p.title}</div>
+      {PROJECTS.map((p, i) => {
+        const headerBg = p.img
+          ? { backgroundImage: `url(${p.img})`, backgroundSize: "cover", backgroundPosition: "center" }
+          : { background: `radial-gradient(120% 120% at 50% 45%, ${p.tint[0]} 0%, ${p.tint[1]} 75%)` }
+        return (
+          <div key={i} style={{ maxWidth: 760, margin: "0 auto 2.5rem", border: `1px solid ${D.border}`, borderRadius: 10, overflow: "hidden" }}>
+            <div style={{ height: "28vh", ...headerBg }} />
+            <div style={{ padding: "1.75rem" }}>
+              {p.dossier ? (
+                <Dossier data={p.dossier} project={p} n={i + 1} c={D} />
+              ) : (
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.68rem", color: D.navy, textTransform: "uppercase", letterSpacing: "0.1em" }}>{String(i + 1).padStart(2, "0")} · {p.tag}</div>
+                  <div style={{ fontFamily: "Fraunces, serif", fontWeight: 600, fontSize: "1.4rem", color: D.ink, marginTop: 8 }}>{p.title}</div>
+                  <p style={{ fontFamily: "Inter, sans-serif", fontWeight: 300, color: D.inkMuted, margin: "12px 0 18px", lineHeight: 1.5 }}>{p.body}</p>
+                  <Stamp text={p.hitl} />
+                </div>
+              )}
+            </div>
           </div>
-          <div style={{ padding: "1.5rem", textAlign: "center" }}>
-            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.68rem", color: D.navy, textTransform: "uppercase", letterSpacing: "0.1em" }}>{String(i + 1).padStart(2, "0")} · {p.tag}</div>
-            <p style={{ fontFamily: "Inter, sans-serif", fontWeight: 300, color: D.inkMuted, margin: "12px 0 18px", lineHeight: 1.5 }}>{p.body}</p>
-            <Stamp text={p.hitl} />
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </section>
   )
 }
@@ -201,9 +254,11 @@ export default function Journey() {
           </motion.div>
         </motion.div>
 
-        {/* DETAIL — crisp, unscaled overlays, one per tile */}
+        {/* DETAIL — crisp, unscaled overlays, one per tile (#1 = full dossier) */}
         {PROJECTS.map((project, i) => (
-          <DetailOverlay key={i} progress={scrollYProgress} k={i} project={project} n={i + 1} />
+          project.dossier
+            ? <DossierOverlay key={i} progress={scrollYProgress} k={i} project={project} n={i + 1} />
+            : <DetailOverlay key={i} progress={scrollYProgress} k={i} project={project} n={i + 1} />
         ))}
 
       </div>
