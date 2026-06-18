@@ -6,6 +6,8 @@ import { ArrowUpRight, Mail, Github, Linkedin } from "lucide-react"
 
 // Scroll-driven dive journey (desk photo → 6 projects → desk).
 import Journey from "./Journey"
+// Experience timeline (own file; takes the page tokens via `c`).
+import Experience from "./Experience"
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 
@@ -176,52 +178,62 @@ const fwRows = [
   },
 ]
 
+// Real employment (résumé 2026 — notes/resume_2026.md is the source of truth).
+// Numbers here are the real, defensible metrics — not the earlier draft placeholders.
 const experience = [
   {
-    role: "AI & Systems Lead — Multi-Agent Systems",
-    company: "Orange Carrot (via Zignow LLC)",
+    company: "Zignow LLC",
+    role: "AI & Systems Lead — Agentic AI & Solutions Architecture",
     period: "Sep 2023 — Present",
-    location: "West Palm Beach, FL",
-    items: [
-      { tag: "CrewAI",    text: "Improved Core Web Vitals 25% via automated image compression and font preloading workflows." },
-      { tag: "LangGraph", text: "Eliminated payment ID mismatches with checkpoint-based state sync — 98% reduction in reconciliation errors." },
-      { tag: "CrewAI",    text: "Automated WordPress-to-ActiveCampaign SKU sync with 100% data accuracy, resolving silent API failures." },
-      { tag: "LangGraph", text: "Built multi-channel attribution with conditional routing — improved affiliate tracking accuracy by 40%." },
+    location: "Strongsville, OH",
+    present: true,
+    clients: [
+      {
+        name: "Orange Carrot",
+        location: "West Palm Beach, FL",
+        items: [
+          { tag: "LangGraph", text: "Crash-safe payment state sync — reconciliation errors ~45/mo → near zero in 6 weeks." },
+          { tag: "LangGraph", pre: "Server-side affiliate tracking across the 20-min checkout gap — ~", metric: { to: 40, suffix: "%" }, post: " more attributed sales vs cookies." },
+          { tag: "CrewAI", text: "WordPress→ActiveCampaign sync that cleans dirty payloads — zero campaign failures after launch." },
+          { tag: "CrewAI", pre: "Site-speed audit, human-reviewed fixes — mobile PageSpeed mid-50s → low-70s (~", metric: { to: 25, suffix: "%" }, post: ")." },
+        ],
+      },
+      {
+        name: "iCashout",
+        location: "Jersey City, NJ",
+        items: [
+          { tag: "Function-calling", pre: "DoorDash exchange for ", metric: { to: 10 }, post: " partners — messy payloads → strict schema, silent rejections gone." },
+          { tag: "OpenAI SDK", pre: "Parallel merchant onboarding (account · terminal · store) — ~", metric: { to: 20, suffix: "%" }, post: " faster activation." },
+          { tag: "RAG", pre: "Support RAG over 500-page manuals — setup tickets ~40 → ~34/mo (", metric: { to: 15, suffix: "%" }, post: ")." },
+          { tag: "Tool-calling", text: "Self-service diagnostic (terminal · API key · plugin, in parallel) — downtime hours → minutes." },
+        ],
+      },
     ],
   },
   {
-    role: "AI & Systems Lead — Agentic API & Integrations",
-    company: "iCashout (via Zignow LLC)",
-    period: "Sep 2023 — Present",
-    location: "Jersey City, NJ",
-    items: [
-      { tag: "Function-calling", text: "Engineered DoorDash API integration for 10 partners, standardizing real-time data exchange across Java/Spring systems." },
-      { tag: "OpenAI SDK",       text: "Accelerated merchant activation by 20% by automating state-dependent backend technical lifecycles." },
-      { tag: "RAG",              text: "Reduced support escalations by 15% with RAG-powered documentation for Pax and Valor terminal setup." },
-      { tag: "Tool-calling",     text: "Improved merchant self-service by providing real-time automated backend troubleshooting on WooCommerce." },
-    ],
-  },
-  {
+    company: "Cloud Integrator Inc.",
     role: "Software Engineer — Frontend & AI Integration",
-    company: "BestBuy (via Cloud Integrator Inc.)",
     period: "Jan 2022 — Aug 2023",
-    location: "Remote",
-    items: [
-      { tag: "OpenAI",        text: "Automated GraphQL schema mapping with experimental prompt-chaining — proved faster feature delivery to the team." },
-      { tag: "React/TS",      text: "Engineered high-fidelity dynamic components from Figma designs into production-ready code." },
-      { tag: "Component Lib", text: "Built universal Component Library (React/TypeScript) — reduced frontend integration time by 15%." },
-      { tag: "Redux",         text: "Enhanced analytics data capture with Redux Toolkit, ensuring reliable performance monitoring." },
+    location: "Fairfax, VA",
+    clients: [
+      {
+        name: "BestBuy",
+        location: "Remote",
+        items: [
+          { tag: "OpenAI", text: "Demoed an agent auto-mapping GraphQL schemas front↔back — pitched AI-accelerated delivery." },
+          { tag: "React/TS", pre: "React/TS Figma→prod (CI/CD on AWS); shared component library cut integration ~", metric: { to: 15, suffix: "%" }, post: "." },
+          { tag: "Redux", text: "Redux Toolkit state — fixed unreliable analytics capture, enabled reliable A/B testing." },
+        ],
+      },
     ],
   },
   {
-    role: "Earlier Career",
-    company: "Trimble · Hyland Software · Cloud Integrator",
+    company: "Earlier career",
     period: "2016 — 2022",
-    location: "OH / VA",
-    items: [
-      { tag: "Quality Eng",  text: "Managed quality engineering strategy at Trimble in SAFe environment — accelerated issue resolution by 25%." },
-      { tag: "Product",      text: "Validated feature development against requirements at Hyland, bridging stakeholders and engineering." },
-      { tag: "Integrations", text: "Architected Salesforce and ServiceNow integrations via Dell Boomi — reduced manual processing by 30%." },
+    roles: [
+      { org: "Trimble Inc.", title: "Product Quality Manager", period: "2018–19", pre: "SAFe quality strategy; automated issue resolution — +", metric: { to: 25, suffix: "%" }, post: " cycle time." },
+      { org: "Hyland Software", title: "Agile Product Analyst", period: "2018", text: "Validated features vs requirements; bridged stakeholders + engineering." },
+      { org: "Cloud Integrator", title: "Cloud Solutions Architect", period: "2016–18", pre: "Salesforce + ServiceNow via Dell Boomi — −", metric: { to: 30, suffix: "%" }, post: " manual processing." },
     ],
   },
 ]
@@ -628,6 +640,9 @@ export default function Home() {
           </R>
         </div>
       </section>
+
+      {/* EXPERIENCE — career timeline (real employment) */}
+      <Experience data={experience} c={C} fw={FW} />
 
       </div>
     </div>
