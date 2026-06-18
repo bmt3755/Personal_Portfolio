@@ -40,7 +40,7 @@ export default function Preloader() {
   useEffect(() => { if (done) document.body.style.overflow = '' }, [done])
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={() => window.dispatchEvent(new Event('intro:start'))}>
       {!done && (
         <motion.div
           initial={{ y: 0 }}
@@ -48,14 +48,14 @@ export default function Preloader() {
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
           style={{
             position: 'fixed', inset: 0, zIndex: 1000,
-            background: '#F7F4EF',
+            background: 'radial-gradient(circle at 30% 25%, rgba(150,110,210,0.14), transparent 60%), #120F18',
             display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
             padding: '2.5rem',
           }}
         >
           <div style={{
             fontFamily: "'JetBrains Mono', monospace", fontSize: '0.7rem',
-            textTransform: 'uppercase', letterSpacing: '0.12em', color: '#A09890',
+            textTransform: 'uppercase', letterSpacing: '0.12em', color: '#7E7388',
           }}>
             The Architect's Table
           </div>
@@ -63,16 +63,16 @@ export default function Preloader() {
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <span style={{
               fontFamily: 'Fraunces, serif', fontWeight: 300, fontStyle: 'italic',
-              fontSize: '1.1rem', color: '#6B6459',
+              fontSize: '1.1rem', color: '#B3A8B8',
             }}>
               Precision before anything gets built.
             </span>
             <span style={{
               fontFamily: 'Fraunces, serif', fontWeight: 700,
-              fontSize: 'clamp(3rem, 12vw, 7rem)', lineHeight: 0.9, color: '#1A1814',
+              fontSize: 'clamp(3rem, 12vw, 7rem)', lineHeight: 0.9, color: '#F2ECE1',
             }}>
               {pct}
-              <span style={{ color: '#2B5278' }}>%</span>
+              <span style={{ color: '#B095D9' }}>%</span>
             </span>
           </div>
         </motion.div>

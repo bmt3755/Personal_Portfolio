@@ -56,6 +56,18 @@ body { background: #16131D; }
   50% { opacity: 0.2; }
 }
 
+/* Code-intro caret blink */
+@keyframes caretBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Name "glows in" as printed output (no movement) */
+@keyframes nameGlow {
+  0%   { text-shadow: 0 0 28px rgba(176,149,217,0.85), 0 0 10px rgba(176,149,217,0.55); }
+  100% { text-shadow: 0 0 0 rgba(176,149,217,0); }
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .pgrid    { grid-template-columns: 1fr !important; }

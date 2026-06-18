@@ -2,6 +2,7 @@
 import { useRef, useState, useEffect } from "react"
 import { motion, useScroll, useTransform, useMotionTemplate, useReducedMotion, useMotionValueEvent } from "framer-motion"
 import Dossier from "./Dossier"
+import CodeIntro from "./CodeIntro"
 
 // ─── Phase 0: grid-hub dive engine (Option A) ───────────────────────────────────
 // Desk → dive into the monitor → the screen becomes a 3×2 GRID of project tiles.
@@ -52,7 +53,7 @@ const S_O = 0.28        // overview scale: whole board fits on screen
 const TRACK_VH = 1200   // total scroll length of the journey
 
 // Per-project share of the 0→1 timeline. GRID_IN = grid revealed; GRID_OUT = last exit.
-const GRID_IN = 0.12, GRID_OUT = 0.90
+const GRID_IN = 0.32, GRID_OUT = 0.90
 const BLOCK = (GRID_OUT - GRID_IN) / PROJECTS.length
 const blockStart = (k) => GRID_IN + k * BLOCK
 
@@ -208,6 +209,7 @@ function FlatFallback() {
 export default function Journey() {
   const reduced = useReducedMotion()
   const [small, setSmall] = useState(false)
+  const [introOn, setIntroOn] = useState(true)
   const trackRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] })
 
@@ -225,9 +227,22 @@ export default function Journey() {
   const boardY = useTransform(scrollYProgress, P_KEYS, TY_KEYS)
   const boardTransform = useMotionTemplate`translate(${boardX}vw, ${boardY}vh) scale(${boardScale})`
   const labelOpacity = useTransform(boardScale, [S_O, S_O + (1 - S_O) * 0.45], [1, 0])
-  const deskOpacity = useTransform(scrollYProgress, [0, 0.045, 0.075, 0.93, 0.965, 1], [1, 1, 0, 0, 1, 1])
-  const deskScale = useTransform(scrollYProgress, [0, 0.08, 0.93, 1], [1, 1.6, 1.25, 1])
-  const boardOpacity = useTransform(scrollYProgress, [0.05, 0.085, 0.92, 0.95], [0, 1, 1, 0])
+
+  // Desk camera: laptop close-up (0) → out to full desk (~0.20) → into the monitor (~0.30) → grid.
+  // Desk reappears for the outro. Pan via translate (laptop = left, monitor = center).
+  const KP = [0, 0.10, 0.20, 0.30, 0.90, 1.0]
+  const deskScale = useTransform(scrollYProgress, KP, [2.4, 2.35, 1.0, 2.6, 1.35, 1.0])
+  const deskX = useTransform(scrollYProgress, KP, [57.6, 56, 0, -10.4, 0, 0])
+  const deskY = useTransform(scrollYProgress, KP, [14.4, 14, 0, 41.6, 0, 0])
+  const deskTransform = useMotionTemplate`translate(${deskX}%, ${deskY}%) scale(${deskScale})`
+  const deskOpacity = useTransform(scrollYProgress, [0, 0.27, 0.31, 0.90, 0.94, 1], [1, 1, 0, 0, 1, 1])
+  const codeIntroOpacity = useTransform(scrollYProgress, [0, 0.10, 0.17], [1, 1, 0])
+  const boardOpacity = useTransform(scrollYProgress, [0.28, 0.33, 0.88, 0.92], [0, 1, 1, 0])
+
+  // Hard-remove the code intro past the laptop phase so it can never ghost over the grid.
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    setIntroOn((prev) => { const on = v < 0.18; return prev === on ? prev : on })
+  })
 
   if (reduced || small) return <FlatFallback />
 
@@ -235,15 +250,18 @@ export default function Journey() {
     <section ref={trackRef} style={{ position: "relative", height: `${TRACK_VH}vh`, background: D.bg }}>
       <div style={{ position: "sticky", top: 0, height: "100vh", overflow: "hidden" }}>
 
-        {/* DESK — real photo, scroll dives into it; intro + outro rest */}
+        {/* DESK — real photo. Camera: laptop close-up → out to full desk → into the monitor. */}
         <motion.div style={{ position: "absolute", inset: 0, opacity: deskOpacity }}>
-          <motion.div style={{ position: "absolute", inset: 0, scale: deskScale, backgroundImage: "url(/images/hero.png)", backgroundSize: "cover", backgroundPosition: "center", willChange: "transform" }} />
-          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(20,17,12,0.15) 0%, rgba(20,17,12,0) 35%, rgba(20,17,12,0.55) 100%)" }} />
-          <div style={{ position: "absolute", left: 0, right: 0, bottom: "8%", textAlign: "center" }}>
-            <h2 style={{ fontFamily: "Fraunces, serif", fontWeight: 600, fontSize: "clamp(1.8rem, 4vw, 3rem)", color: D.ink }}>The Architect's Desk</h2>
-            <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "0.72rem", color: D.inkFaint, textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 12 }}>scroll to enter the monitor</p>
-          </div>
+          <motion.div style={{ position: "absolute", inset: 0, transformOrigin: "center", transform: deskTransform, backgroundImage: "url(/images/hero.png)", backgroundSize: "cover", backgroundPosition: "center", willChange: "transform" }} />
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(125% 100% at 50% 45%, rgba(10,8,14,0.35) 0%, rgba(8,6,11,0.78) 100%)" }} />
         </motion.div>
+
+        {/* CODE INTRO — name printed on the laptop screen; UNMOUNTS past the intro (no stranded layer/ghost). */}
+        {introOn && (
+          <motion.div style={{ position: "absolute", inset: 0, opacity: codeIntroOpacity, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 2rem", pointerEvents: "none" }}>
+            <CodeIntro c={D} />
+          </motion.div>
+        )}
 
         {/* BOARD — the zooming grid of tiles */}
         <motion.div style={{ position: "absolute", inset: 0, opacity: boardOpacity }}>

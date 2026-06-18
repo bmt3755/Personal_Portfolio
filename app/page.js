@@ -406,7 +406,7 @@ export default function Home() {
               { label: 'Contact',    href: '#contact'    },
             ].map(({ label, href }) => (
               <a key={href} href={href} onClick={(e) => go(e, href)} className="navlink" style={{
-                fontFamily: "'JetBrains Mono', monospace", fontSize: '0.7rem',
+                fontFamily: "'JetBrains Mono', monospace", fontSize: '0.86rem', fontWeight: 500,
                 color: C.inkMuted, textDecoration: 'none',
               }}>
                 {label}
@@ -439,16 +439,7 @@ export default function Home() {
             </Mono>
           </motion.div>
 
-          {/* Name */}
-          <motion.h1 variants={heroItem} className="heroname" style={{
-            fontFamily: 'Fraunces, serif', lineHeight: 1.05,
-            fontSize: '4.5rem', marginBottom: '2rem', letterSpacing: '-0.01em',
-          }}>
-            <span style={{ display: 'block', fontWeight: 700, color: C.ink }}>Manjeera</span>
-            <span style={{ display: 'block', fontWeight: 300, fontStyle: 'italic', color: C.inkMuted }}>Thogarcheti</span>
-          </motion.h1>
-
-          {/* Philosophy */}
+          {/* Philosophy (leads — the name now lives in the entry intro) */}
           <motion.div variants={heroItem} style={{ marginBottom: '2.5rem', lineHeight: 1.4 }}>
             <span style={{
               display: 'block',
