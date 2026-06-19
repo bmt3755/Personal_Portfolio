@@ -13,11 +13,7 @@
 # Private — local planning & prep notes (not for publication)
 /.claude
 CLAUDE.md
-master.md
-generic_framework.md
-projects_for_resume.md
-Architecture_decisions_phase_1.md
-Architecture_decisions_phase_2.md
+/notes
 
 # Private — resume
 *.pdf
@@ -25,13 +21,9 @@ Architecture_decisions_phase_2.md
 # Private — dead code (replaced by the photo Journey)
 /app/Scene.js
 
-# Private — duplicate source images (the site serves from /public/images)
-/images
-
 # Private — throwaway screenshots & capture scripts (root-level only)
 /*.png
 screenshot.mjs
-preview-shot.js
 
 # OS / editor cruft
 .DS_Store
