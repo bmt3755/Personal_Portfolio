@@ -6,6 +6,8 @@ import { ArrowUpRight, Mail, Github, Linkedin } from "lucide-react"
 
 // Scroll-driven dive journey (desk photo → 6 projects → desk).
 import Journey from "./Journey"
+// Drifting LLM/RAG fragment field — fixed global backdrop.
+import FragmentField from "./FragmentField"
 // Reusable project deep-dive panel (plain + technical), shared with the Case Files.
 import Dossier from "./Dossier"
 
@@ -480,9 +482,16 @@ export default function Home() {
   return (
     <div style={{ position: 'relative' }}>
 
-      {/* Old robotic 3D table removed — the real-photo Journey is the cinematic now. */}
+      {/* JOURNEY — lowest layer (zIndex 0); the fragment field drifts over its photos */}
+      <div style={{ position: 'relative', zIndex: 0 }}>
+        <Journey />
+      </div>
 
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      {/* Drifting LLM/RAG fragment field — fixed backdrop, above the Journey, behind content */}
+      <FragmentField c={C} />
+
+      {/* Content — zIndex 2, above the field; translucent section bgs let the field show through */}
+      <div style={{ position: 'relative', zIndex: 2 }}>
 
       {/* NAV */}
       <nav style={{
@@ -517,15 +526,12 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* IMMERSIVE JOURNEY — the architect's desk greets first (desk → 6 projects → desk) */}
-      <Journey />
-
       {/* HERO */}
       <section style={{
         minHeight: '100vh',
         display: 'flex', alignItems: 'center',
         paddingTop: '80px', paddingBottom: '4rem',
-        background: `radial-gradient(120% 80% at 20% -10%, rgba(150,110,210,0.14), transparent 55%), ${C.bg}`,
+        background: `radial-gradient(120% 80% at 20% -10%, rgba(150,110,210,0.14), transparent 55%), rgba(22,19,29,0.66)`,
       }}>
         <motion.div
           variants={heroContainer} initial="hidden" animate="show"
@@ -613,7 +619,7 @@ export default function Home() {
 
       {/* FRAMEWORK INTELLIGENCE */}
       <section id="framework" style={{
-        background: C.surface, scrollMarginTop: '70px',
+        background: 'rgba(30,26,40,0.66)', scrollMarginTop: '70px',
         padding: '6rem 0',
       }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 2rem' }}>
