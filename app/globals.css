@@ -29,6 +29,10 @@ body { background: #16131D; }
 .fwrow td { transition: background 0.15s; }
 .fwrow:hover td { background: rgba(138, 169, 214, 0.06); }
 
+/* "OPEN →" pill fills in on row hover so it reads as a button */
+.openpill { transition: background 0.18s, border-color 0.18s; }
+.fwrow:hover .openpill { background: rgba(138, 169, 214, 0.16); border-color: #8AA9D6; }
+
 /* HITL stamp — the signature element */
 .hitl {
   display: inline-flex;

@@ -11,7 +11,7 @@ const MONO = "'JetBrains Mono', monospace"
 const SERIF = "Fraunces, serif"
 const SANS = "Inter, sans-serif"
 
-export default function Dossier({ data, project, n, c, panel = false }) {
+export default function Dossier({ data, project, n, total = 6, c, panel = false }) {
   const [open, setOpen] = useState(false)
   const lenis = useLenis()
   const para = { fontFamily: SANS, fontSize: "0.88rem", color: "#F6F1E8", marginTop: 12, lineHeight: 1.55 }
@@ -38,7 +38,7 @@ export default function Dossier({ data, project, n, c, panel = false }) {
       {/* Header */}
       <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
         <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: c.navy, textTransform: "uppercase", letterSpacing: "0.1em" }}>{project.tag}</span>
-        <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: c.inkFaint }}>{String(n).padStart(2, "0")} / 06</span>
+        <span style={{ fontFamily: MONO, fontSize: "0.68rem", color: c.inkFaint }}>{String(n).padStart(2, "0")} / {String(total).padStart(2, "0")}</span>
       </div>
       <h3 style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(1.5rem, 3vw, 2.2rem)", color: c.ink, lineHeight: 1.1, letterSpacing: "-0.01em", marginTop: 6 }}>{project.title}</h3>
       <div style={{ fontFamily: MONO, fontSize: "0.68rem", color: c.inkFaint, marginTop: 7, letterSpacing: "0.04em" }}>{data.subtitle}</div>
@@ -47,27 +47,31 @@ export default function Dossier({ data, project, n, c, panel = false }) {
       <p style={para}>{data.stakes}</p>
       <p style={para}>{data.decision}</p>
 
-      {/* HITL stamp + plain note */}
-      <div style={{ marginTop: 16 }}>
-        <span style={{
-          display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px",
-          border: `1.5px solid ${c.stamp}80`, borderRadius: 3, color: c.stamp, background: `${c.stamp}1A`,
-          transform: "rotate(-0.7deg)", fontFamily: MONO, fontSize: "0.6rem", letterSpacing: "0.07em", textTransform: "uppercase",
-        }}>
-          <span style={{ fontSize: "0.75rem" }}>⊕</span>{data.stamp}
-        </span>
-        <p style={{ fontFamily: SANS, fontSize: "0.8rem", color: "#DCD3C8", marginTop: 9, lineHeight: 1.5 }}>{data.hitlNote}</p>
-      </div>
+      {/* HITL stamp + plain note — only where the project genuinely has a human gate */}
+      {data.stamp && (
+        <div style={{ marginTop: 16 }}>
+          <span style={{
+            display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px",
+            border: `1.5px solid ${c.stamp}80`, borderRadius: 3, color: c.stamp, background: `${c.stamp}1A`,
+            transform: "rotate(-0.7deg)", fontFamily: MONO, fontSize: "0.6rem", letterSpacing: "0.07em", textTransform: "uppercase",
+          }}>
+            <span style={{ fontSize: "0.75rem" }}>⊕</span>{data.stamp}
+          </span>
+          {data.hitlNote && <p style={{ fontFamily: SANS, fontSize: "0.8rem", color: "#DCD3C8", marginTop: 9, lineHeight: 1.5 }}>{data.hitlNote}</p>}
+        </div>
+      )}
 
       {/* Proof */}
-      <p style={{ fontFamily: MONO, fontSize: "0.7rem", color: c.ink, marginTop: 14 }}>✓ {data.proof}</p>
+      {data.proof && <p style={{ fontFamily: MONO, fontSize: "0.7rem", color: c.ink, marginTop: 14 }}>✓ {data.proof}</p>}
 
       {/* Tech tags */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 11 }}>
-        {data.tech.map((t) => (
-          <span key={t} style={{ fontFamily: MONO, fontSize: "0.58rem", color: c.inkMuted, border: `1px solid ${c.border}`, borderRadius: 3, padding: "2px 7px" }}>{t}</span>
-        ))}
-      </div>
+      {data.tech?.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 11 }}>
+          {data.tech.map((t) => (
+            <span key={t} style={{ fontFamily: MONO, fontSize: "0.58rem", color: c.inkMuted, border: `1px solid ${c.border}`, borderRadius: 3, padding: "2px 7px" }}>{t}</span>
+          ))}
+        </div>
+      )}
 
       {/* L2 — technical detail. In a slide it opens a scrollable panel (holds the journey);
           on the flat page it just expands inline. */}
@@ -121,15 +125,17 @@ export default function Dossier({ data, project, n, c, panel = false }) {
         </div>
       )}
 
-      {/* L3 — source */}
-      <div style={{ marginTop: 16 }}>
-        <a href={data.source} target="_blank" rel="noopener noreferrer" style={{
-          display: "inline-flex", alignItems: "center", gap: 7, fontFamily: MONO, fontSize: "0.68rem",
-          color: c.navy, textDecoration: "none", borderBottom: `1px solid ${c.navy}55`, paddingBottom: 2,
-        }}>
-          <Github size={14} /> VIEW SOURCE
-        </a>
-      </div>
+      {/* L3 — source (omitted for proprietary client work) */}
+      {data.source && (
+        <div style={{ marginTop: 16 }}>
+          <a href={data.source} target="_blank" rel="noopener noreferrer" style={{
+            display: "inline-flex", alignItems: "center", gap: 7, fontFamily: MONO, fontSize: "0.68rem",
+            color: c.navy, textDecoration: "none", borderBottom: `1px solid ${c.navy}55`, paddingBottom: 2,
+          }}>
+            <Github size={14} /> VIEW SOURCE
+          </a>
+        </div>
+      )}
     </div>
   )
 }

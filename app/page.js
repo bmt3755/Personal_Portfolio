@@ -6,8 +6,8 @@ import { ArrowUpRight, Mail, Github, Linkedin } from "lucide-react"
 
 // Scroll-driven dive journey (desk photo → 6 projects → desk).
 import Journey from "./Journey"
-// Experience timeline (own file; takes the page tokens via `c`).
-import Experience from "./Experience"
+// Reusable project deep-dive panel (plain + technical), shared with the Case Files.
+import Dossier from "./Dossier"
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 
@@ -178,65 +178,30 @@ const fwRows = [
   },
 ]
 
-// Real employment (résumé 2026 — notes/resume_2026.md is the source of truth).
-// Numbers here are the real, defensible metrics — not the earlier draft placeholders.
-const experience = [
-  {
-    company: "Zignow LLC",
-    role: "AI & Systems Lead — Agentic AI & Solutions Architecture",
-    period: "Sep 2023 — Present",
-    location: "Strongsville, OH",
-    present: true,
-    clients: [
-      {
-        name: "Orange Carrot",
-        location: "West Palm Beach, FL",
-        items: [
-          { tag: "LangGraph", text: "Crash-safe payment state sync — reconciliation errors ~45/mo → near zero in 6 weeks." },
-          { tag: "LangGraph", pre: "Server-side affiliate tracking across the 20-min checkout gap — ~", metric: { to: 40, suffix: "%" }, post: " more attributed sales vs cookies." },
-          { tag: "CrewAI", text: "WordPress→ActiveCampaign sync that cleans dirty payloads — zero campaign failures after launch." },
-          { tag: "CrewAI", pre: "Site-speed audit, human-reviewed fixes — mobile PageSpeed mid-50s → low-70s (~", metric: { to: 25, suffix: "%" }, post: ")." },
-        ],
-      },
-      {
-        name: "iCashout",
-        location: "Jersey City, NJ",
-        items: [
-          { tag: "Function-calling", pre: "DoorDash exchange for ", metric: { to: 10 }, post: " partners — messy payloads → strict schema, silent rejections gone." },
-          { tag: "OpenAI SDK", pre: "Parallel merchant onboarding (account · terminal · store) — ~", metric: { to: 20, suffix: "%" }, post: " faster activation." },
-          { tag: "RAG", pre: "Support RAG over 500-page manuals — setup tickets ~40 → ~34/mo (", metric: { to: 15, suffix: "%" }, post: ")." },
-          { tag: "Tool-calling", text: "Self-service diagnostic (terminal · API key · plugin, in parallel) — downtime hours → minutes." },
-        ],
-      },
-    ],
-  },
-  {
-    company: "Cloud Integrator Inc.",
-    role: "Software Engineer — Frontend & AI Integration",
-    period: "Jan 2022 — Aug 2023",
-    location: "Fairfax, VA",
-    clients: [
-      {
-        name: "BestBuy",
-        location: "Remote",
-        items: [
-          { tag: "OpenAI", text: "Demoed an agent auto-mapping GraphQL schemas front↔back — pitched AI-accelerated delivery." },
-          { tag: "React/TS", pre: "React/TS Figma→prod (CI/CD on AWS); shared component library cut integration ~", metric: { to: 15, suffix: "%" }, post: "." },
-          { tag: "Redux", text: "Redux Toolkit state — fixed unreliable analytics capture, enabled reliable A/B testing." },
-        ],
-      },
-    ],
-  },
-  {
-    company: "Earlier career",
-    period: "2016 — 2022",
-    roles: [
-      { org: "Trimble Inc.", title: "Product Quality Manager", period: "2018–19", pre: "SAFe quality strategy; automated issue resolution — +", metric: { to: 25, suffix: "%" }, post: " cycle time." },
-      { org: "Hyland Software", title: "Agile Product Analyst", period: "2018", text: "Validated features vs requirements; bridged stakeholders + engineering." },
-      { org: "Cloud Integrator", title: "Cloud Solutions Architect", period: "2016–18", pre: "Salesforce + ServiceNow via Dell Boomi — −", metric: { to: 30, suffix: "%" }, post: " manual processing." },
-    ],
-  },
+// Career skeleton (employers + dates) — the thin strip above the table.
+// Project depth now lives in the clickable Framework rows, not a separate section.
+const career = [
+  { org: "Zignow LLC", note: "Orange Carrot · iCashout", period: "Sep 2023 — Present" },
+  { org: "Cloud Integrator / BestBuy", note: "Frontend & AI integration", period: "2022 — 23" },
+  { org: "Trimble · Hyland · Cloud Integrator", note: "QA · Product · Integrations", period: "2016 — 22" },
 ]
+
+// Per-project deep dives for the clickable Framework rows (keyed by row.project).
+// Real client work → no public "View Source". HITL stamp only where it genuinely applies.
+const dossiers = {
+  "Payment ID Sync": {
+    subtitle: "Orange Carrot · payment reconciliation · LangGraph checkpointing",
+    stakes: "On a live payment system, a server crash mid-transaction can double-charge a customer or lose track of which payment belonged to whom. Support was logging around 45 of these reconciliation errors a month.",
+    decision: "Built on LangGraph so the process saves its place as it runs — if it crashes, it resumes exactly where it stopped instead of starting over. A plain Python script keeps its state in memory, so a crash loses everything; that's why it was the wrong tool here despite being simpler.",
+    proof: "Reconciliation errors ~45/month → near zero within 6 weeks of deploy.",
+    tech: ["Python", "LangGraph", "Checkpointer", "CRM API"],
+    technical: [
+      ["Pattern", "Stateful sync graph with checkpoint persistence across distributed API nodes and backend CRM endpoints."],
+      ["Why not a plain script", "In-memory state is lost on crash, risking double charges on restart. LangGraph's checkpointer persists state to durable storage, so a resumed run continues mid-payment safely."],
+      ["Result", "Support-logged reconciliation errors dropped from ~45/mo to near zero within 6 weeks."],
+    ],
+  },
+}
 
 const skills = [
   {
@@ -348,11 +313,43 @@ function Mono({ children, style = {} }) {
   )
 }
 
+// Rejected option: strike draws across once the table settles into view, staggered
+// row by row, then STAYS struck (decision record — every rejected option is crossed out).
+function RejectedStrike({ text, reduced, started, idx = 0 }) {
+  return (
+    <span style={{ position: 'relative', display: 'inline-block', whiteSpace: 'nowrap' }}>
+      <Mono style={{ fontSize: '0.72rem', color: C.inkFaint }}>{text}</Mono>
+      <motion.span
+        aria-hidden
+        style={{
+          position: 'absolute', left: 0, right: 0, top: '52%', height: 1.5,
+          background: C.inkMuted, transformOrigin: 'left',
+        }}
+        initial={{ scaleX: reduced ? 1 : 0 }}
+        animate={{ scaleX: (reduced || started) ? 1 : 0 }}
+        transition={{ duration: 0.45, ease: 'easeInOut', delay: reduced ? 0 : 0.7 + idx * 0.12 }}
+      />
+    </span>
+  )
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Home() {
   const lenis = useLenis()
   const reduced = useReducedMotion()
+
+  // Which Framework row's deep-dive panel is open (index into fwRows), or null.
+  const [openRow, setOpenRow] = useState(null)
+
+  // While the panel is open: freeze page scroll and let Escape close it.
+  useEffect(() => {
+    if (openRow == null) return
+    lenis?.stop()
+    const onKey = (e) => { if (e.key === 'Escape') setOpenRow(null) }
+    window.addEventListener('keydown', onKey)
+    return () => { window.removeEventListener('keydown', onKey); lenis?.start() }
+  }, [openRow, lenis])
 
   // Route nav/CTA anchors through lenis so they keep the momentum feel and
   // clear the fixed 60px nav (offset replaces the old scrollMarginTop trick).
@@ -387,6 +384,11 @@ export default function Home() {
   })
   const fwY = useTransform(scrollYProgress, [0, 1], [reduced ? 0 : 28, reduced ? 0 : -28])
 
+  // One shared trigger for all the rejected-strike animations: fire once the table
+  // is in view, then each line draws in staggered (see RejectedStrike).
+  const fwTableRef = useRef(null)
+  const fwTableInView = useInView(fwTableRef, { once: true, amount: 0.2 })
+
   return (
     <div style={{ position: 'relative' }}>
 
@@ -414,7 +416,6 @@ export default function Home() {
             {[
               { label: 'Framework',  href: '#framework'  },
               { label: 'Cases',      href: '#projects'   },
-              { label: 'Experience', href: '#experience' },
               { label: 'Contact',    href: '#contact'    },
             ].map(({ label, href }) => (
               <a key={href} href={href} onClick={(e) => go(e, href)} className="navlink" style={{
@@ -545,18 +546,33 @@ export default function Home() {
               fontFamily: 'Inter, sans-serif', fontSize: '0.95rem', color: C.inkMuted,
               marginTop: '1.25rem', maxWidth: '620px', lineHeight: 1.6,
             }}>
-              The right tool depends on the problem — not familiarity. Here's the full decision record.
+              The right tool depends on the problem — not familiarity. Here's the full decision record. <span style={{ color: C.navy }}>Click any row for the full story.</span>
             </p>
 
-            <div className="fwtablewrap" style={{ marginTop: '2.5rem' }}>
+            {/* Career strip — employers + dates, the work-history skeleton */}
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', gap: '0.5rem 2rem',
+              marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: `1px solid ${C.borderLight}`,
+            }}>
+              {career.map((j) => (
+                <div key={j.org} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <Mono style={{ fontSize: '0.7rem', color: C.ink }}>{j.org}</Mono>
+                  <Mono style={{ fontSize: '0.62rem', color: C.inkFaint, letterSpacing: '0.04em' }}>
+                    {j.note} · {j.period}
+                  </Mono>
+                </div>
+              ))}
+            </div>
+
+            <div ref={fwTableRef} className="fwtablewrap" style={{ marginTop: '2.5rem' }}>
               <table style={{
                 width: '100%', minWidth: '680px', borderCollapse: 'collapse',
                 fontFamily: 'Inter, sans-serif',
               }}>
                 <thead>
                   <tr>
-                    {['Project', 'Company', 'Chosen', 'Rejected', 'Why'].map(h => (
-                      <th key={h} style={{
+                    {['Project', 'Company', 'Chosen', 'Rejected', 'Why', ''].map((h, hi) => (
+                      <th key={hi} style={{
                         textAlign: 'left', padding: '0.75rem 1rem',
                         background: C.surface2, color: C.inkMuted,
                         fontFamily: "'JetBrains Mono', monospace", fontSize: '0.62rem',
@@ -569,13 +585,26 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {fwRows.map((row, i) => (
-                    <tr key={i} className="fwrow">
+                  {fwRows.map((row, i) => {
+                    const hasDossier = !!dossiers[row.project]
+                    return (
+                    <tr key={i} className="fwrow"
+                      onClick={hasDossier ? () => setOpenRow(i) : undefined}
+                      style={{ cursor: hasDossier ? 'pointer' : 'default' }}
+                    >
                       <td style={{
                         padding: '0.9rem 1rem', borderBottom: `1px solid ${C.borderLight}`,
                         fontSize: '0.85rem', color: C.ink, fontWeight: 500, verticalAlign: 'top',
                       }}>
-                        {row.project}
+                        {hasDossier && !reduced ? (
+                          <motion.span
+                            style={{ display: 'inline-block' }}
+                            animate={{ opacity: [1, 0.5, 1] }}
+                            transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut' }}
+                          >
+                            {row.project}
+                          </motion.span>
+                        ) : row.project}
                       </td>
                       <td style={{
                         padding: '0.9rem 1rem', borderBottom: `1px solid ${C.borderLight}`,
@@ -593,12 +622,7 @@ export default function Home() {
                         padding: '0.9rem 1rem', borderBottom: `1px solid ${C.borderLight}`,
                         verticalAlign: 'top',
                       }}>
-                        <Mono style={{
-                          fontSize: '0.72rem', color: C.inkFaint,
-                          textDecoration: 'line-through', whiteSpace: 'nowrap',
-                        }}>
-                          {row.rejected}
-                        </Mono>
+                        <RejectedStrike text={row.rejected} reduced={reduced} started={fwTableInView} idx={i} />
                       </td>
                       <td style={{
                         padding: '0.9rem 1rem', borderBottom: `1px solid ${C.borderLight}`,
@@ -611,8 +635,23 @@ export default function Home() {
                           {row.why}
                         </div>
                       </td>
+                      <td style={{
+                        padding: '0.9rem 1rem', borderBottom: `1px solid ${C.borderLight}`,
+                        verticalAlign: 'top', textAlign: 'right', whiteSpace: 'nowrap',
+                      }}>
+                        {hasDossier && (
+                          <span className="openpill" style={{
+                            fontFamily: "'JetBrains Mono', monospace", fontSize: '0.62rem', fontWeight: 500,
+                            letterSpacing: '0.06em', color: C.navy,
+                            border: `1px solid ${C.navy}55`, borderRadius: 20, padding: '4px 11px',
+                          }}>
+                            OPEN →
+                          </span>
+                        )}
+                      </td>
                     </tr>
-                  ))}
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -641,8 +680,44 @@ export default function Home() {
         </div>
       </section>
 
-      {/* EXPERIENCE — career timeline (real employment) */}
-      <Experience data={experience} c={C} fw={FW} />
+      {/* Framework row deep-dive — slide-in panel reusing the Case File Dossier */}
+      {openRow != null && (
+        <div
+          data-lenis-prevent
+          onClick={() => setOpenRow(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: 'rgba(6,5,9,0.74)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
+          }}
+        >
+          <motion.div
+            data-lenis-prevent
+            onClick={(e) => e.stopPropagation()}
+            initial={{ x: reduced ? 0 : 60, opacity: reduced ? 1 : 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              width: 'min(560px, 100%)', height: '100%', overflowY: 'auto', overscrollBehavior: 'contain',
+              background: C.bg, borderLeft: `1px solid ${C.border}`,
+              boxShadow: '-30px 0 80px rgba(0,0,0,0.6)', padding: '4.5rem 2rem 3rem',
+            }}
+          >
+            <button onClick={() => setOpenRow(null)} aria-label="Close" style={{
+              position: 'absolute', top: '1.25rem', right: '1.5rem',
+              background: 'none', border: 'none', color: C.inkFaint, cursor: 'pointer',
+              fontSize: '1.3rem', lineHeight: 1, padding: 4,
+            }}>✕</button>
+            <Dossier
+              project={{ tag: fwRows[openRow].fw, title: fwRows[openRow].project }}
+              data={dossiers[fwRows[openRow].project]}
+              n={openRow + 1}
+              total={fwRows.length}
+              c={C}
+            />
+          </motion.div>
+        </div>
+      )}
 
       </div>
     </div>
