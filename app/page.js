@@ -15,25 +15,26 @@ import Dossier from "./Dossier"
 
 // ── Theme tokens (warm/purple dark) ──
 const C = {
-  bg:          "#16131D",
-  surface:     "#1E1A28",
-  surface2:    "#272132",
-  ink:         "#F2ECE1",
-  inkMuted:    "#B3A8B8",
-  inkFaint:    "#7E7388",
-  navy:        "#8AA9D6",
-  navyDim:     "rgba(138,169,214,0.10)",
+  bg:          "#1A1019",
+  surface:     "#251726",
+  surface2:    "#301E31",
+  ink:         "#EFE6CF",
+  inkMuted:    "#AAA296",
+  inkFaint:    "#837C70",
+  navy:        "#D79A4F",
+  navyDim:     "rgba(215,154,79,0.12)",
+  gold:        "#D8A24C",
   stamp:       "#D8A36E",
   stampBg:     "rgba(216,163,110,0.10)",
-  border:      "#322B3D",
-  borderLight: "#252031",
+  border:      "#352C22",
+  borderLight: "#211B14",
 }
 
 const FW = {
-  langgraph: { color: "#8AA9D6", bg: "rgba(138,169,214,0.10)", border: "rgba(138,169,214,0.30)" },
-  crewai:    { color: "#5FBBA0", bg: "rgba(95,187,160,0.10)",  border: "rgba(95,187,160,0.30)" },
-  openai:    { color: "#B095D9", bg: "rgba(176,149,217,0.10)", border: "rgba(176,149,217,0.30)" },
-  rag:       { color: "#9AA4BC", bg: "rgba(154,164,188,0.10)", border: "rgba(154,164,188,0.30)" },
+  langgraph: { color: "#D9A45A", bg: "rgba(217,164,90,0.10)", border: "rgba(217,164,90,0.30)" },
+  crewai:    { color: "#C9885E", bg: "rgba(201,136,94,0.10)", border: "rgba(201,136,94,0.30)" },
+  openai:    { color: "#C39177", bg: "rgba(195,145,119,0.10)", border: "rgba(195,145,119,0.30)" },
+  rag:       { color: "#B3A084", bg: "rgba(179,160,132,0.10)", border: "rgba(179,160,132,0.30)" },
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -412,8 +413,8 @@ function RejectedStrike({ text, reduced, started, idx = 0 }) {
       <motion.span
         aria-hidden
         style={{
-          position: 'absolute', left: 0, right: 0, top: '52%', height: 1.5,
-          background: C.inkMuted, transformOrigin: 'left',
+          position: 'absolute', left: 0, right: 0, top: '52%', height: 1.2,
+          background: 'rgba(131,124,112,0.8)', transformOrigin: 'left',
         }}
         initial={{ scaleX: reduced ? 1 : 0 }}
         animate={{ scaleX: (reduced || started) ? 1 : 0 }}
@@ -496,7 +497,7 @@ export default function Home() {
       {/* NAV */}
       <nav style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        background: 'rgba(22,19,29,0.85)',
+        background: 'rgba(26,16,25,0.85)',
         backdropFilter: 'blur(14px)',
         WebkitBackdropFilter: 'blur(14px)',
         borderBottom: `1px solid ${C.borderLight}`,
@@ -531,7 +532,7 @@ export default function Home() {
         minHeight: '100vh',
         display: 'flex', alignItems: 'center',
         paddingTop: '80px', paddingBottom: '4rem',
-        background: `radial-gradient(120% 80% at 20% -10%, rgba(150,110,210,0.14), transparent 55%), rgba(22,19,29,0.66)`,
+        background: `radial-gradient(120% 80% at 20% -10%, rgba(216,162,76,0.12), transparent 55%), rgba(26,16,25,0.66)`,
       }}>
         <motion.div
           variants={heroContainer} initial="hidden" animate="show"
@@ -540,8 +541,8 @@ export default function Home() {
 
           {/* Eyebrow */}
           <motion.div variants={heroItem} style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-            <span style={{ display: 'block', width: '2.5rem', borderTop: `1.5px solid ${C.navy}` }} />
-            <Mono style={{ color: C.navy, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.09em' }}>
+            <span style={{ display: 'block', width: '2.5rem', borderTop: `1.5px solid ${C.gold}` }} />
+            <Mono style={{ color: C.gold, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.09em' }}>
               AI & Systems Lead · Fremont, CA
             </Mono>
           </motion.div>
@@ -619,12 +620,12 @@ export default function Home() {
 
       {/* FRAMEWORK INTELLIGENCE */}
       <section id="framework" style={{
-        background: 'rgba(30,26,40,0.66)', scrollMarginTop: '70px',
+        background: 'rgba(37,23,38,0.66)', scrollMarginTop: '70px',
         padding: '6rem 0',
       }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 2rem' }}>
           <R>
-            <Mono style={{ color: C.navy, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.09em' }}>
+            <Mono style={{ color: C.gold, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.09em' }}>
               Framework Intelligence
             </Mono>
 

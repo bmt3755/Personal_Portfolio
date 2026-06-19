@@ -46,7 +46,7 @@ const FRAGMENTS = [
 ]
 
 export default function FragmentField({ c }) {
-  const violet = "#B095D9" // the theme's violet undertone (matches FW.openai)
+  const violet = "#D7A24C" // warm gold accent for the orbit rings + accent fragments
   return (
     <div className="fragfield" aria-hidden="true" style={{
       position: "fixed", inset: 0, zIndex: 1, pointerEvents: "none", overflow: "hidden",

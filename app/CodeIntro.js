@@ -4,7 +4,7 @@ import { motion, useReducedMotion } from "framer-motion"
 
 const MONO = "'JetBrains Mono', monospace"
 const SERIF = "Fraunces, serif"
-const CMD = "WhoAmI"
+const CMD = "Who_Am_I"
 let introDone = false // module-level: once the reveal has played, re-mounts show the final state
 
 // Terminal-style name reveal on the laptop screen. Waits for the preloader to finish
@@ -56,7 +56,7 @@ export default function CodeIntro({ c }) {
         <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(2.1rem, 6.5vw, 4.2rem)", color: c.ink, lineHeight: 1.02, letterSpacing: "-0.015em", animation: (out && !reduced) ? "nameGlow 0.9s ease-out" : "none" }}>
           Manjeera Thogarcheti
         </div>
-        <div style={{ fontFamily: MONO, fontSize: "0.78rem", color: c.navy, textTransform: "uppercase", letterSpacing: "0.14em", marginTop: 14 }}>
+        <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: "0.78rem", color: c.navy, textTransform: "uppercase", letterSpacing: "0.14em", marginTop: 14 }}>
           AI & Systems Lead
         </div>
         <div style={{ fontFamily: MONO, fontSize: "0.7rem", fontWeight: 500, color: c.inkMuted, textTransform: "uppercase", letterSpacing: "0.12em", marginTop: 30 }}>

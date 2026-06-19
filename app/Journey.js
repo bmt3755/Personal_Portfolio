@@ -16,9 +16,19 @@ import CodeIntro from "./CodeIntro"
 // Engine: framer-motion transforms only. Zero new deps. Real images land in Phase 1.
 
 const D = {
-  bg: "#14110C", ink: "#F2ECE1", inkMuted: "#B0A697", inkFaint: "#7C7264",
-  navy: "#7FA8D4", stamp: "#D6A271", border: "#332D24",
+  bg: "#14110C", ink: "#EFE6CF", inkMuted: "#B0A697", inkFaint: "#7C7264",
+  navy: "#D79A4F", stamp: "#D6A271", border: "#332D24",
 }
+
+// Persistent warm blend over every photo tile — keeps cool-toned shots (medical blue,
+// rainy blue scenes) on-palette even at full zoom. Two stacked layers:
+//   • "color" shifts the actual hue of blue areas warm (works on dark photos where overlay can't)
+//   • "overlay" adds warmth/richness to the midtones
+// Tuning knobs: nudge op up = warmer (color drives hue, overlay drives glow).
+const WARM = [
+  { color: "#C9803A", blend: "color",   op: 0.22 },
+  { color: "#CC8438", blend: "overlay", op: 0.26 },
+]
 
 // Full dossier content for Case File 01 (the vertical slice). Others get the short overlay until built.
 const CO_DOSSIER = {
@@ -39,12 +49,12 @@ const CO_DOSSIER = {
 }
 
 const PROJECTS = [
-  { tag: "Construction / AEC",        title: "Change Order Management Agent",   body: "Supervisor · LangGraph — checkpoint persistence for a legal audit trail.", hitl: "PM approves before any escalation email sends",        tint: ["#1B2535", "#0F131B"], img: "/images/construction.png", dossier: CO_DOSSIER },
-  { tag: "Insurance / FinTech",       title: "Insurance Claim Processing Agent", body: "Router · LangGraph — conditional routing to isolated specialists.",        hitl: "NEEDS_REVIEW (5–7) routes to a human adjuster",       tint: ["#15271F", "#0D1512"], img: "/images/insurance.png" },
-  { tag: "Healthcare / MedTech",      title: "Patient Briefing System",          body: "Supervisor + Parallel — PHI redacted before the graph runs.",             hitl: "PHI never reaches an LLM",                            tint: ["#251B30", "#140F1A"], img: "/images/briefing.png" },
+  { tag: "Construction / AEC",        title: "Change Order Management Agent",   body: "Supervisor · LangGraph — checkpoint persistence for a legal audit trail.", hitl: "PM approves before any escalation email sends",        tint: ["#2A2014", "#130D07"], img: "/images/construction.png", dossier: CO_DOSSIER },
+  { tag: "Insurance / FinTech",       title: "Insurance Claim Processing Agent", body: "Router · LangGraph — conditional routing to isolated specialists.",        hitl: "NEEDS_REVIEW (5–7) routes to a human adjuster",       tint: ["#26220F", "#110F06"], img: "/images/insurance.png" },
+  { tag: "Healthcare / MedTech",      title: "Patient Briefing System",          body: "Supervisor + Parallel — PHI redacted before the graph runs.",             hitl: "PHI never reaches an LLM",                            tint: ["#281A2A", "#140D15"], img: "/images/briefing.png" },
   { tag: "FinTech / Banking",         title: "Loan Default Risk Monitor",        body: "5 parallel risk dimensions — latency cut 5×.",                            hitl: "Banker decides: STABLE / WATCH / AT_RISK / CRITICAL", tint: ["#2A2017", "#15100A"], img: "/images/loan.png" },
-  { tag: "Healthcare / Clinical Ops", title: "Readmission Risk Prediction",      body: "6 parallel dimensions — scored in under 5 seconds.",                      hitl: "Clinician decides intervention level",                tint: ["#1C2733", "#0E141A"], img: "/images/readmission.png" },
-  { tag: "Construction / AEC",        title: "RFI Triage & Response Agent",      body: "Router + conditional fork — validates priority before routing.",           hitl: "Low confidence → human research path, no auto-send",  tint: ["#142621", "#0C1411"], img: "/images/rfi.png" },
+  { tag: "Healthcare / Clinical Ops", title: "Readmission Risk Prediction",      body: "6 parallel dimensions — scored in under 5 seconds.",                      hitl: "Clinician decides intervention level",                tint: ["#2C1D15", "#150D09"], img: "/images/readmission.png" },
+  { tag: "Construction / AEC",        title: "RFI Triage & Response Agent",      body: "Router + conditional fork — validates priority before routing.",           hitl: "Low confidence → human research path, no auto-send",  tint: ["#262011", "#110E06"], img: "/images/rfi.png" },
 ]
 
 const COLS = 3, ROWS = 2
@@ -80,7 +90,7 @@ function Monitor() {
   return (
     <div style={{
       width: "min(46vw, 520px)", aspectRatio: "16 / 10", borderRadius: 10,
-      border: `1px solid ${D.border}`, background: "linear-gradient(160deg, #1d2a3a 0%, #0e1320 100%)",
+      border: `1px solid ${D.border}`, background: "linear-gradient(160deg, #2a2114 0%, #120d07 100%)",
       boxShadow: "0 30px 80px rgba(0,0,0,0.55)", padding: "14px 16px",
       display: "flex", flexDirection: "column", gap: 8,
     }}>
@@ -115,6 +125,10 @@ function Tile({ project, n, i, labelOpacity }) {
       transform: `translate(${offX(i)}vw, ${offY(i)}vh)`,
       display: "flex", alignItems: "center", justifyContent: "center", ...bg,
     }}>
+      {/* persistent warm blend — subtly shifts cool photos toward the palette, even at full zoom */}
+      {project.img && WARM.map((w, wi) => (
+        <div key={`warm${wi}`} style={{ position: "absolute", inset: 0, background: w.color, mixBlendMode: w.blend, opacity: w.op, pointerEvents: "none" }} />
+      ))}
       {/* scrim keeps the grid label readable over a photo; fades out as the tile fills the screen */}
       <motion.div style={{ position: "absolute", inset: 0, opacity: labelOpacity, background: "radial-gradient(120% 100% at 50% 50%, rgba(20,17,12,0.25) 0%, rgba(20,17,12,0.72) 100%)" }} />
       <motion.div style={{ position: "relative", opacity: labelOpacity, textAlign: "center", padding: "0 6%" }}>

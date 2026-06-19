@@ -48,14 +48,14 @@ export default function Preloader() {
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
           style={{
             position: 'fixed', inset: 0, zIndex: 1000,
-            background: 'radial-gradient(circle at 30% 25%, rgba(150,110,210,0.14), transparent 60%), #120F18',
+            background: 'radial-gradient(circle at 30% 25%, rgba(216,162,76,0.13), transparent 60%), #160F12',
             display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
             padding: '2.5rem',
           }}
         >
           <div style={{
             fontFamily: "'JetBrains Mono', monospace", fontSize: '0.7rem',
-            textTransform: 'uppercase', letterSpacing: '0.12em', color: '#7E7388',
+            textTransform: 'uppercase', letterSpacing: '0.12em', color: '#8A7E66',
           }}>
             The Architect's Table
           </div>
@@ -63,16 +63,16 @@ export default function Preloader() {
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
             <span style={{
               fontFamily: 'Fraunces, serif', fontWeight: 300, fontStyle: 'italic',
-              fontSize: '1.1rem', color: '#B3A8B8',
+              fontSize: '1.1rem', color: '#B9AB93',
             }}>
               Precision before anything gets built.
             </span>
             <span style={{
               fontFamily: 'Fraunces, serif', fontWeight: 700,
-              fontSize: 'clamp(3rem, 12vw, 7rem)', lineHeight: 0.9, color: '#F2ECE1',
+              fontSize: 'clamp(3rem, 12vw, 7rem)', lineHeight: 0.9, color: '#EFE6CF',
             }}>
               {pct}
-              <span style={{ color: '#B095D9' }}>%</span>
+              <span style={{ color: '#D8A24C' }}>%</span>
             </span>
           </div>
         </motion.div>

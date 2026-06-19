@@ -1,7 +1,7 @@
 *  { box-sizing: border-box; margin: 0; padding: 0; }
 /* scroll-behavior: smooth removed — lenis owns scrolling (see Architecture_decisions_phase_1.md) */
 /* Theme colors (warm/purple dark) */
-body { background: #16131D; }
+body { background: #1A1019; }
 
 /* Scroll-triggered reveal animation */
 .reveal {
@@ -23,15 +23,15 @@ body { background: #16131D; }
 
 /* Nav links */
 .navlink { transition: color 0.2s; }
-.navlink:hover { color: #8AA9D6 !important; }
+.navlink:hover { color: #D79A4F !important; }
 
 /* Framework table row hover */
 .fwrow td { transition: background 0.15s; }
-.fwrow:hover td { background: rgba(138, 169, 214, 0.06); }
+.fwrow:hover td { background: rgba(215, 154, 79, 0.07); }
 
 /* "OPEN →" pill fills in on row hover so it reads as a button */
 .openpill { transition: background 0.18s, border-color 0.18s; }
-.fwrow:hover .openpill { background: rgba(138, 169, 214, 0.16); border-color: #8AA9D6; }
+.fwrow:hover .openpill { background: rgba(215, 154, 79, 0.16); border-color: #D79A4F; }
 
 /* HITL stamp — the signature element */
 .hitl {
@@ -52,7 +52,7 @@ body { background: #16131D; }
 
 /* Ghost button */
 .ghostbtn { transition: border-color 0.2s, color 0.2s; }
-.ghostbtn:hover { border-color: #8AA9D6 !important; color: #8AA9D6 !important; }
+.ghostbtn:hover { border-color: #D79A4F !important; color: #D79A4F !important; }
 
 /* Dossier "Technical detail" pulse — draws the eye to the expander */
 @keyframes dossierPulse {
@@ -68,8 +68,8 @@ body { background: #16131D; }
 
 /* Name "glows in" as printed output (no movement) */
 @keyframes nameGlow {
-  0%   { text-shadow: 0 0 28px rgba(176,149,217,0.85), 0 0 10px rgba(176,149,217,0.55); }
-  100% { text-shadow: 0 0 0 rgba(176,149,217,0); }
+  0%   { text-shadow: 0 0 28px rgba(216,162,76,0.85), 0 0 10px rgba(216,162,76,0.55); }
+  100% { text-shadow: 0 0 0 rgba(216,162,76,0); }
 }
 
 /* Fragment field — slow drift + faint orbit (the global LLM/RAG backdrop) */
