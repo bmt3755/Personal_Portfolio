@@ -82,7 +82,7 @@ export default function Dossier({ data, project, n, total = 6, c, panel = false 
         background: `${c.navy}14`, border: `1px solid ${c.navy}66`, borderRadius: 20, padding: "6px 13px",
       }}>
         <span style={{ width: 7, height: 7, borderRadius: "50%", background: c.navy, animation: "dossierPulse 1.15s ease-in-out infinite" }} />
-        {open && !panel ? "Hide technical detail" : "Technical detail"}
+        {open && !panel ? "Hide technical details" : "Click here for technical details"}
       </button>
 
       {/* inline expand — flat page only */}
