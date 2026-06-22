@@ -73,9 +73,12 @@ body { background: #1A1019; }
 }
 
 /* Fragment field — slow drift + faint orbit (the global LLM/RAG backdrop) */
-@keyframes fragDrift {
-  0%, 100% { transform: translate(0, 0); opacity: var(--op, 0.12); }
-  50%      { transform: translate(var(--dx, 0), var(--dy, 0)); opacity: calc(var(--op, 0.12) * 0.5); }
+/* Words drift the full width of the screen, fading in/out at the edges. */
+@keyframes fragCross {
+  0%   { transform: translateX(48vw);  opacity: 0; }
+  14%  { opacity: var(--op, 0.12); }
+  86%  { opacity: var(--op, 0.12); }
+  100% { transform: translateX(-48vw); opacity: 0; }
 }
 @keyframes orbitSpin {
   to { transform: rotate(360deg); }

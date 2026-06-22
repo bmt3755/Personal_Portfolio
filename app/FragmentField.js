@@ -10,8 +10,9 @@
 
 // Single visibility knob: scales every fragment's opacity. Up = more present.
 const OP = 3.5
-// Drift-speed knob: multiplies every duration. Lower = faster. (1 = original pace.)
-const SPEED = 0.22
+// Drift-speed knob: multiplies every duration. Lower = faster. Words now traverse
+// the full screen vertically, so this is slower than the old in-place drift.
+const SPEED = 1.0
 
 // Three faint elliptical orbit rings — different size ratios, speeds, and spin
 // directions so they read as distinct orbits. w/h in vw/vh, dur in seconds.
@@ -46,10 +47,15 @@ const FRAGMENTS = [
 ]
 
 export default function FragmentField({ c }) {
-  const violet = "#D7A24C" // warm gold accent for the orbit rings + accent fragments
+  const gold = "#C8B68A"      // every fragment shares ONE muted sandy-gold — uniform field, cooler/calmer than full gold
+  const ringColor = "#BCB3A6" // lighter neutral-warm — rings, so they read on the warm floor without blending in
+  // Fade the whole field to nothing through the screen's center, so words dissolve as
+  // they approach the name/headings and re-appear past them (pure CSS, no per-word logic).
+  const nameMask = "radial-gradient(ellipse 38% 28% at 50% 49%, transparent 0%, transparent 34%, #000 92%)"
   return (
     <div className="fragfield" aria-hidden="true" style={{
       position: "fixed", inset: 0, zIndex: 1, pointerEvents: "none", overflow: "hidden",
+      maskImage: nameMask, WebkitMaskImage: nameMask,
     }}>
       {/* Three faint violet orbit rings — slow rotation; ellipses so the motion reads. */}
       {RINGS.map((r, i) => (
@@ -59,14 +65,14 @@ export default function FragmentField({ c }) {
           transformOrigin: "center",
           animation: `orbitSpin ${r.dur}s linear infinite`, animationDirection: r.dir,
         }}>
-          <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: `1px solid ${violet}22` }} />
-          <div style={{ position: "absolute", top: -3, left: "50%", width: 5, height: 5, marginLeft: -2.5, borderRadius: "50%", background: `${violet}66` }} />
+          <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: `1px solid ${ringColor}40` }} />
+          <div style={{ position: "absolute", top: -3, left: "50%", width: 5, height: 5, marginLeft: -2.5, borderRadius: "50%", background: `${ringColor}99` }} />
         </div>
       ))}
 
       {/* The drifting handwritten term fragments. */}
       {FRAGMENTS.map((f, i) => {
-        const op = Math.min(f.op * OP, 0.55)
+        const op = Math.min(f.op * OP, 0.5)
         return (
         <span
           key={i}
@@ -75,12 +81,13 @@ export default function FragmentField({ c }) {
             position: "absolute", top: f.top, left: f.left,
             fontFamily: "'Caveat', cursive", fontWeight: 400,
             fontSize: `${(f.size * 1.35).toFixed(2)}rem`, letterSpacing: "0", whiteSpace: "nowrap",
-            color: f.accent ? violet : c.inkFaint,
+            color: gold,
             opacity: op,
             textShadow: "0 1px 12px rgba(0,0,0,0.5)", // legible over bright photo areas
-            "--op": op, "--dx": `${f.dx}px`, "--dy": `${f.dy}px`,
-            animation: `fragDrift ${(f.dur * SPEED).toFixed(1)}s ease-in-out infinite`,
-            animationDelay: `-${(i * 1.7).toFixed(1)}s`,
+            "--op": op,
+            animation: `fragCross ${(f.dur * SPEED).toFixed(1)}s linear infinite`,
+            animationDirection: i % 2 ? "reverse" : "normal", // mix of left- and right-moving words
+            animationDelay: `-${(i * 2.3).toFixed(1)}s`,       // spread them out along the traverse
             willChange: "transform",
           }}
         >
