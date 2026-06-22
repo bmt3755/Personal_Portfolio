@@ -48,13 +48,98 @@ const CO_DOSSIER = {
   ],
 }
 
+// Case Files 02–06 — same shape as #1 (plain L1 + technical L2). Content from the résumé
+// portfolio; proof line only where real tests exist (#5, #6). Sources are the real repos.
+const INSURANCE_DOSSIER = {
+  subtitle: "LangGraph router · borderline calls go to a human",
+  stakes: "Insurance claims come in four very different shapes — auto, health, property, travel — and each needs its own checks. Sorting and processing them by hand is slow, and the decisions come out inconsistent. This build reads a claim, works out which type it is, and hands it to the one specialist that knows how to check that exact kind.",
+  decision: "The smart part is keeping the four specialists fully separate. Each only knows its own job, so the auto-claim logic can be fixed or improved without touching health, property, or travel. The router just reads the claim and points it to the right door — and it never forces a verdict it isn't sure about.",
+  stamp: "Borderline scores go to a human adjuster",
+  hitlNote: "Clear cases get a straight APPROVE or DENY. Anything in the grey middle is marked NEEDS_REVIEW and handed to a person — the system won't guess on a close call.",
+  tech: ["Python", "LangGraph", "OpenAI", "Pydantic"],
+  source: "https://github.com/bmt3755/insurance-claim-system",
+  technical: [
+    ["Pattern", "Router → 4 isolated specialist agents (auto / health / property / travel). The router classifies the claim; only the matching specialist runs."],
+    ["Decision logic", "Each specialist returns a score: >7 APPROVE, <5 DENY, 5–7 NEEDS_REVIEW (human)."],
+    ["Isolation", "Zero cross-agent dependencies — one file per agent, each independently testable and replaceable."],
+    ["Validation", "Pydantic schema on every claim input and agent output."],
+  ],
+}
+
+const BRIEFING_DOSSIER = {
+  subtitle: "Parallel agents · PHI redacted before anything runs",
+  stakes: "A health-system strategy team needed clear briefings built from patient PDFs — the condition, the standard treatment, what's emerging, and which providers are involved. The catch: those records hold sensitive personal health information that must never reach an outside AI model.",
+  decision: "The non-negotiable comes first: strip out every piece of personal health information before any work starts. The system keeps the raw record sealed and only ever shows the agents a redacted copy. Several agents then read it at once, and the final briefing notes which agent found each fact.",
+  stamp: "PHI never reaches an LLM",
+  hitlNote: "Redaction is a hard checkpoint before the graph runs — the original text stays sealed, only a scrubbed copy moves forward, and every chunk is tagged so one patient's data can't surface in another's query.",
+  tech: ["Python", "LangGraph", "ChromaDB", "pymupdf", "pytesseract", "Pydantic", "Gradio"],
+  source: "https://github.com/bmt3755/Patient_Briefing_System",
+  technical: [
+    ["Pattern", "Supervisor + parallel: Condition, Standard-Care, and Provider agents run together; Treatment Research runs once the condition is confirmed; a Debrief agent synthesizes all four."],
+    ["Redaction", "State separates original_text (never leaves the system) from redacted_text (what agents see); redaction is confirmed before execution begins."],
+    ["Access control", "patient_id + org_id on every state entry, and ACL tags on every ChromaDB chunk to prevent cross-patient leakage."],
+    ["Audit", "Per-agent status, timestamp, and error logged; the final briefing cites which agent produced each finding. Gradio clinical UI."],
+  ],
+}
+
+const LOAN_DOSSIER = {
+  subtitle: "5 parallel risk checks · the banker decides",
+  stakes: "By the time a borrower misses a payment, it's usually too late. Banks want to catch rising risk early — a dropping credit score, income falling, debt creeping up. This build watches active borrowers and flags trouble before the miss, so someone can step in with a payment plan instead of collections.",
+  decision: "The five risk signals don't depend on each other, so the system checks all five at once instead of one after another — a 5× speed-up. A plain math layer (no AI) turns the scores into a clear rating, and the AI only explains it and suggests an action. The banker makes the actual call.",
+  stamp: "Banker decides: STABLE / WATCH / AT_RISK / CRITICAL",
+  hitlNote: "The system rates the risk and recommends a step — do nothing, send a reminder, offer a payment plan, or escalate — but a banker chooses what actually happens.",
+  tech: ["Python", "LangGraph", "ChromaDB", "Pydantic", "LangSmith"],
+  source: "https://github.com/bmt3755/Loan_Default_Risk_System",
+  technical: [
+    ["Pattern", "Supervisor spawns 5 parallel checkers (credit, transactions, payment history, external signals, debt-to-income), then 3 sequential steps: risk calc → explanation → action."],
+    ["Risk layer", "A deterministic math calculator (no LLM) averages the scores and applies thresholds → STABLE / WATCH / AT_RISK / CRITICAL. The model never sets the rating."],
+    ["Memory", "ChromaDB RAG layer for historical comparison across a borrower's record."],
+    ["Guardrails", "Pydantic range checks on every checker; safe-default fallbacks so a failed checker never crashes the run. LangSmith tracing."],
+  ],
+}
+
+const READMISSION_DOSSIER = {
+  subtitle: "6 parallel checks · scored before the patient leaves",
+  stakes: "A busy hospital discharges 200+ patients a day. To send the right ones home with extra follow-up, staff need a readmission-risk score fast — within seconds of discharge, not hours later when the window has closed.",
+  decision: "Six risk angles, all independent — so the system runs them at the same time to hit an under-5-second target. One after another it'd be roughly 3× slower and miss the moment. A math layer combines the six into one score, the AI explains it, and a router sets the follow-up level. The clinician decides the actual intervention.",
+  stamp: "Clinician decides the intervention level",
+  hitlNote: "The system scores the risk and routes it — standard discharge, enhanced follow-up, or immediate intervention — but the clinician makes the care decision.",
+  proof: "Smoke + end-to-end tests (pytest).",
+  tech: ["Python", "LangGraph", "OpenAI", "Pydantic"],
+  source: "https://github.com/bmt3755/Patient_Readmission_System",
+  technical: [
+    ["Pattern", "Supervisor + 6 parallel analyzers (history, current condition, meds, social factors, appointment compliance, disease-specific), then 3 sequential: score → explanation → escalation routing."],
+    ["Latency", "All 6 run in parallel to meet a <5s budget at 200+ discharges/day; sequential would be ~3× slower."],
+    ["Scoring", "A math calculator (no LLM) composites the six; each agent returns a score (1–10), a LOW/MEDIUM/HIGH label, and a reason."],
+    ["Tests", "Smoke + end-to-end (pytest)."],
+  ],
+}
+
+const RFI_DOSSIER = {
+  subtitle: "Router + conditional fork · low confidence goes to a human",
+  stakes: "Construction teams get dozens of RFIs a day — each needs the right drawing, spec, or contract clause found, an answer drafted, and a clean record kept. A wrong answer can become evidence in a dispute, so accuracy and a paper trail matter as much as speed.",
+  decision: "Two safeguards make it trustworthy. It reads the legal fields with plain code, not an AI, so there's no model guesswork on the record. And before it trusts a priority label, a check confirms the label was actually computed — not left at a default. When confidence is low, it hands the RFI to a person instead of auto-sending.",
+  stamp: "Low confidence → human research path, no auto-send",
+  hitlNote: "High-confidence answers are drafted with a cite-and-verify check; anything uncertain is routed to a human-research path that lays out the verified facts without auto-sending a reply.",
+  proof: "Smoke + end-to-end tests (pytest).",
+  tech: ["Python", "LangGraph", "ChromaDB", "Pydantic", "LangSmith"],
+  source: "https://github.com/bmt3755/RFI_Triage_System",
+  technical: [
+    ["Pattern", "Router + conditional fork. Read & Extract (code, no LLM) → parallel keyword + semantic search → priority check → a graph edge validates the label before routing to draft-and-send or hand-research."],
+    ["Extraction", "Legal form fields pulled deterministically by code — no model risk on the record."],
+    ["Cite-and-verify", "The draft path makes the model name its source, then verifies that source actually appears in the visible reply; bounded retry (2 attempts) on citation failure."],
+    ["Search", "Exact-word (keyword) + meaning-based (vector) run in parallel, so an exact code like 'Sheet M202' isn't missed by semantic search alone."],
+    ["Tests", "Smoke + end-to-end (pytest). LangSmith tracing."],
+  ],
+}
+
 const PROJECTS = [
   { tag: "Construction / AEC",        title: "Change Order Management Agent",   body: "Supervisor · LangGraph — checkpoint persistence for a legal audit trail.", hitl: "PM approves before any escalation email sends",        tint: ["#2A2014", "#130D07"], img: "/images/construction.png", dossier: CO_DOSSIER },
-  { tag: "Insurance / FinTech",       title: "Insurance Claim Processing Agent", body: "Router · LangGraph — conditional routing to isolated specialists.",        hitl: "NEEDS_REVIEW (5–7) routes to a human adjuster",       tint: ["#26220F", "#110F06"], img: "/images/insurance.png" },
-  { tag: "Healthcare / MedTech",      title: "Patient Briefing System",          body: "Supervisor + Parallel — PHI redacted before the graph runs.",             hitl: "PHI never reaches an LLM",                            tint: ["#281A2A", "#140D15"], img: "/images/briefing.png" },
-  { tag: "FinTech / Banking",         title: "Loan Default Risk Monitor",        body: "5 parallel risk dimensions — latency cut 5×.",                            hitl: "Banker decides: STABLE / WATCH / AT_RISK / CRITICAL", tint: ["#2A2017", "#15100A"], img: "/images/loan.png" },
-  { tag: "Healthcare / Clinical Ops", title: "Readmission Risk Prediction",      body: "6 parallel dimensions — scored in under 5 seconds.",                      hitl: "Clinician decides intervention level",                tint: ["#2C1D15", "#150D09"], img: "/images/readmission.png" },
-  { tag: "Construction / AEC",        title: "RFI Triage & Response Agent",      body: "Router + conditional fork — validates priority before routing.",           hitl: "Low confidence → human research path, no auto-send",  tint: ["#262011", "#110E06"], img: "/images/rfi.png" },
+  { tag: "Insurance / FinTech",       title: "Insurance Claim Processing Agent", body: "Router · LangGraph — conditional routing to isolated specialists.",        hitl: "NEEDS_REVIEW (5–7) routes to a human adjuster",       tint: ["#26220F", "#110F06"], img: "/images/insurance.png", dossier: INSURANCE_DOSSIER },
+  { tag: "Healthcare / MedTech",      title: "Patient Briefing System",          body: "Supervisor + Parallel — PHI redacted before the graph runs.",             hitl: "PHI never reaches an LLM",                            tint: ["#281A2A", "#140D15"], img: "/images/briefing.png", dossier: BRIEFING_DOSSIER },
+  { tag: "FinTech / Banking",         title: "Loan Default Risk Monitor",        body: "5 parallel risk dimensions — latency cut 5×.",                            hitl: "Banker decides: STABLE / WATCH / AT_RISK / CRITICAL", tint: ["#2A2017", "#15100A"], img: "/images/loan.png", dossier: LOAN_DOSSIER },
+  { tag: "Healthcare / Clinical Ops", title: "Readmission Risk Prediction",      body: "6 parallel dimensions — scored in under 5 seconds.",                      hitl: "Clinician decides intervention level",                tint: ["#2C1D15", "#150D09"], img: "/images/readmission.png", dossier: READMISSION_DOSSIER },
+  { tag: "Construction / AEC",        title: "RFI Triage & Response Agent",      body: "Router + conditional fork — validates priority before routing.",           hitl: "Low confidence → human research path, no auto-send",  tint: ["#262011", "#110E06"], img: "/images/rfi.png", dossier: RFI_DOSSIER },
 ]
 
 const COLS = 3, ROWS = 2
