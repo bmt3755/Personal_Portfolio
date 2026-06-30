@@ -58,6 +58,10 @@ body { background: #1A1019; }
 .contactrow { transition: border-color 0.2s, transform 0.2s; }
 .contactrow:hover { border-color: #D79A4F; transform: translateX(3px); }
 
+/* Authored-framework repo cards */
+.fwcard { transition: border-color 0.2s, transform 0.2s; }
+.fwcard:hover { border-color: #D79A4F; transform: translateY(-2px); }
+
 /* Dossier "Technical detail" pulse — draws the eye to the expander */
 @keyframes dossierPulse {
   0%, 100% { opacity: 1; }

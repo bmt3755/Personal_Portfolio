@@ -514,7 +514,6 @@ export default function Home() {
             {[
               { label: 'Framework',  href: '#framework'  },
               { label: 'Skills',     href: '#skills'     },
-              { label: 'Cases',      href: '#projects'   },
               { label: 'Contact',    href: '#contact'    },
             ].map(({ label, href }) => (
               <a key={href} href={href} onClick={(e) => go(e, href)} className="navlink" style={{
@@ -568,7 +567,7 @@ export default function Home() {
 
           {/* CTAs */}
           <motion.div variants={heroItem} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '4rem' }}>
-            <a href="#projects" onClick={(e) => go(e, '#projects')} style={{
+            <a href="#framework" onClick={(e) => go(e, '#framework')} style={{
               display: 'inline-flex', alignItems: 'center',
               padding: '0.7rem 1.5rem', background: C.navy, color: C.bg,
               borderRadius: '4px', textDecoration: 'none',
@@ -644,6 +643,45 @@ export default function Home() {
             }}>
               The right tool depends on the problem — not familiarity. Here's the full decision record. <span style={{ color: C.navy }}>Click any row for the full story.</span>
             </p>
+
+            {/* Authored frameworks — the method behind every call */}
+            <div style={{ marginTop: '1.75rem', paddingTop: '1.25rem', borderTop: `1px solid ${C.borderLight}` }}>
+              <Mono style={{ fontSize: '0.68rem', color: C.inkMuted, lineHeight: 1.6 }}>
+                The calls below aren&apos;t ad-hoc — they run on two open-source frameworks I authored:
+              </Mono>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem' }}>
+                {[
+                  {
+                    name: 'Agentic Blueprint',
+                    desc: 'How I pick the pattern — a 3-axis data audit (structure · sensitivity · retrieval) → the right LangGraph shape.',
+                    href: 'https://github.com/bmt3755/Agentic-Blueprint',
+                  },
+                  {
+                    name: 'Human-First Build Protocol',
+                    desc: 'How I build it — option tables per component, and I approve every one before code.',
+                    href: 'https://github.com/bmt3755/Human-First-Build-Protocol',
+                  },
+                ].map(({ name, desc, href }) => (
+                  <a key={name} href={href} target="_blank" rel="noopener noreferrer" className="fwcard" style={{
+                    flex: '1 1 280px', display: 'block', textDecoration: 'none',
+                    border: `1px solid ${C.border}`, borderRadius: '6px',
+                    padding: '1rem 1.1rem', background: C.navyDim,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
+                      <Github size={15} color={C.navy} />
+                      <Mono style={{ fontSize: '0.78rem', fontWeight: 500, color: C.navy }}>{name}</Mono>
+                      <ArrowUpRight size={13} color={C.inkFaint} style={{ marginLeft: 'auto' }} />
+                    </div>
+                    <span style={{
+                      fontFamily: 'Inter, sans-serif', fontSize: '0.8rem',
+                      color: C.inkMuted, lineHeight: 1.5,
+                    }}>
+                      {desc}
+                    </span>
+                  </a>
+                ))}
+              </div>
+            </div>
 
             {/* Career strip — employers + dates, the work-history skeleton */}
             <div style={{
