@@ -775,6 +775,85 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CONTACT + FOOTER */}
+      <section id="contact" style={{
+        background: 'rgba(37,23,38,0.66)', scrollMarginTop: '70px',
+        padding: '6rem 0 0',
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 2rem' }}>
+          <R>
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', gap: '3rem',
+              justifyContent: 'space-between', alignItems: 'flex-start',
+            }}>
+              {/* Left — invitation */}
+              <div style={{ maxWidth: '480px' }}>
+                <Mono style={{ color: C.gold, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.09em' }}>
+                  Contact
+                </Mono>
+                <h2 style={{
+                  fontFamily: 'Fraunces, serif', fontSize: '2.5rem', lineHeight: 1.1,
+                  marginTop: '1rem', letterSpacing: '-0.01em',
+                }}>
+                  <span style={{ display: 'block', fontWeight: 600, color: C.ink }}>Let&apos;s talk</span>
+                  <span style={{ display: 'block', fontWeight: 300, fontStyle: 'italic', color: C.inkMuted }}>about hard problems.</span>
+                </h2>
+                <p style={{
+                  fontFamily: 'Inter, sans-serif', fontSize: '0.95rem', color: C.inkMuted,
+                  marginTop: '1.25rem', lineHeight: 1.6,
+                }}>
+                  Open to AI &amp; systems roles · Fremont, CA
+                </p>
+              </div>
+
+              {/* Right — direct links */}
+              <div style={{ display: 'flex', flexDirection: 'column', minWidth: '300px', flex: '1 1 300px', maxWidth: '420px' }}>
+                {[
+                  { Icon: Mail,     label: 'Email',    value: 'bramara.thogarcheti@gmail.com', href: 'mailto:bramara.thogarcheti@gmail.com' },
+                  { Icon: Github,   label: 'GitHub',   value: 'github.com/bmt3755',            href: 'https://github.com/bmt3755' },
+                  { Icon: Linkedin, label: 'LinkedIn', value: 'linkedin.com/in/bmt-humane-ai', href: 'https://linkedin.com/in/bmt-humane-ai' },
+                ].map(({ Icon, label, value, href }) => {
+                  const ext = href.startsWith('http')
+                  return (
+                    <a key={label} href={href}
+                      target={ext ? '_blank' : undefined}
+                      rel={ext ? 'noopener noreferrer' : undefined}
+                      className="contactrow"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.9rem',
+                        padding: '0.95rem 0.5rem', borderBottom: `1px solid ${C.borderLight}`,
+                        textDecoration: 'none', color: C.ink,
+                      }}>
+                      <Icon size={18} color={C.navy} strokeWidth={1.6} />
+                      <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Mono style={{ fontSize: '0.58rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: C.inkFaint }}>{label}</Mono>
+                        <Mono style={{ fontSize: '0.82rem', color: C.ink }}>{value}</Mono>
+                      </span>
+                      <ArrowUpRight size={15} color={C.inkFaint} style={{ marginLeft: 'auto' }} />
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              display: 'flex', flexWrap: 'wrap', gap: '1rem',
+              justifyContent: 'space-between', alignItems: 'center',
+              marginTop: '5rem', paddingTop: '1.5rem', paddingBottom: '2.5rem',
+              borderTop: `1px solid ${C.border}`,
+            }}>
+              <span style={{ fontFamily: 'Fraunces, serif', fontWeight: 600, fontSize: '1rem', color: C.ink }}>
+                Manjeera Thogarcheti
+              </span>
+              <Mono style={{ fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: C.inkFaint }}>
+                AI &amp; Systems Lead · 2026
+              </Mono>
+            </div>
+          </R>
+        </div>
+      </section>
+
       {/* Framework row deep-dive — slide-in panel reusing the Case File Dossier */}
       {openRow != null && (
         <div

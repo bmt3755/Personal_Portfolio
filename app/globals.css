@@ -54,6 +54,10 @@ body { background: #1A1019; }
 .ghostbtn { transition: border-color 0.2s, color 0.2s; }
 .ghostbtn:hover { border-color: #D79A4F !important; color: #D79A4F !important; }
 
+/* Contact links */
+.contactrow { transition: border-color 0.2s, transform 0.2s; }
+.contactrow:hover { border-color: #D79A4F; transform: translateX(3px); }
+
 /* Dossier "Technical detail" pulse — draws the eye to the expander */
 @keyframes dossierPulse {
   0%, 100% { opacity: 1; }
