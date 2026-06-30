@@ -513,6 +513,7 @@ export default function Home() {
           <div className="navlinks" style={{ display: 'flex', gap: '2rem' }}>
             {[
               { label: 'Framework',  href: '#framework'  },
+              { label: 'Skills',     href: '#skills'     },
               { label: 'Cases',      href: '#projects'   },
               { label: 'Contact',    href: '#contact'    },
             ].map(({ label, href }) => (
@@ -768,6 +769,54 @@ export default function Home() {
                     background: FW[key].color, display: 'inline-block',
                   }} />
                   <Mono style={{ fontSize: '0.7rem', color: C.inkMuted }}>{name}</Mono>
+                </div>
+              ))}
+            </div>
+          </R>
+        </div>
+      </section>
+
+      {/* SKILLS */}
+      <section id="skills" style={{
+        background: 'rgba(26,16,25,0.66)', scrollMarginTop: '70px',
+        padding: '6rem 0',
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 2rem' }}>
+          <R>
+            <Mono style={{ color: C.gold, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.09em' }}>
+              Technical Depth
+            </Mono>
+            <h2 style={{
+              fontFamily: 'Fraunces, serif', fontSize: '2.5rem', lineHeight: 1.1,
+              marginTop: '1rem', letterSpacing: '-0.01em',
+            }}>
+              <span style={{ display: 'block', fontWeight: 600, color: C.ink }}>Depth across</span>
+              <span style={{ display: 'block', fontWeight: 300, fontStyle: 'italic', color: C.inkMuted }}>the stack.</span>
+            </h2>
+
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '2.5rem', marginTop: '3rem',
+            }}>
+              {skills.map((group) => (
+                <div key={group.label}>
+                  <Mono style={{
+                    color: C.gold, fontSize: '0.7rem', textTransform: 'uppercase',
+                    letterSpacing: '0.08em', display: 'block', marginBottom: '0.5rem',
+                  }}>
+                    {group.label}
+                  </Mono>
+                  <div>
+                    {group.items.map((item) => (
+                      <div key={item} style={{
+                        fontFamily: 'Inter, sans-serif', fontSize: '0.85rem',
+                        color: C.inkMuted, lineHeight: 1.5,
+                        padding: '0.7rem 0', borderTop: `1px solid ${C.borderLight}`,
+                      }}>
+                        {item}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
