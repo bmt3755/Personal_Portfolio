@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react"
 import { motion, useScroll, useTransform, useInView, animate, useReducedMotion } from "framer-motion"
 import { useLenis } from "lenis/react"
-import { ArrowUpRight, Mail, Github, Linkedin } from "lucide-react"
+import { ArrowUpRight, Github, Linkedin, Send } from "lucide-react"
 
 // Scroll-driven dive journey (desk photo → 6 projects → desk).
 import Journey from "./Journey"
@@ -10,6 +10,8 @@ import Journey from "./Journey"
 import FragmentField from "./FragmentField"
 // Reusable project deep-dive panel (plain + technical), shared with the Case Files.
 import Dossier from "./Dossier"
+// Contact modal — form routes through /api/contact (email stays server-side).
+import ContactModal from "./ContactModal"
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 
@@ -432,6 +434,8 @@ export default function Home() {
 
   // Which Framework row's deep-dive panel is open (index into fwRows), or null.
   const [openRow, setOpenRow] = useState(null)
+  // Contact form modal open/closed.
+  const [contactOpen, setContactOpen] = useState(false)
 
   // While the panel is open: freeze page scroll and let Escape close it.
   useEffect(() => {
@@ -441,6 +445,15 @@ export default function Home() {
     window.addEventListener('keydown', onKey)
     return () => { window.removeEventListener('keydown', onKey); lenis?.start() }
   }, [openRow, lenis])
+
+  // Same freeze + Escape behavior while the contact modal is open.
+  useEffect(() => {
+    if (!contactOpen) return
+    lenis?.stop()
+    const onKey = (e) => { if (e.key === 'Escape') setContactOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => { window.removeEventListener('keydown', onKey); lenis?.start() }
+  }, [contactOpen, lenis])
 
   // Route nav/CTA anchors through lenis so they keep the momentum feel and
   // clear the fixed 60px nav (offset replaces the old scrollMarginTop trick).
@@ -576,15 +589,15 @@ export default function Home() {
             }}>
               View Cases →
             </a>
-            <a href="mailto:bramara.thogarcheti@gmail.com" className="ghostbtn" style={{
+            <button onClick={() => setContactOpen(true)} className="ghostbtn" style={{
               display: 'inline-flex', alignItems: 'center',
               padding: '0.7rem 1.5rem',
-              border: `1px solid ${C.border}`, color: C.inkMuted,
-              borderRadius: '4px', textDecoration: 'none',
+              border: `1px solid ${C.border}`, color: C.inkMuted, background: 'transparent',
+              borderRadius: '4px', cursor: 'pointer',
               fontFamily: "'JetBrains Mono', monospace", fontSize: '0.78rem',
             }}>
               Get in touch
-            </a>
+            </button>
           </motion.div>
 
           {/* Stats strip */}
@@ -893,33 +906,33 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Right — direct links */}
+              {/* Right — message button + links (no email shown; form routes server-side) */}
               <div style={{ display: 'flex', flexDirection: 'column', minWidth: '300px', flex: '1 1 300px', maxWidth: '420px' }}>
+                <button onClick={() => setContactOpen(true)} style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem',
+                  padding: '0.95rem 1.2rem', background: C.navy, color: C.bg, border: `1px solid ${C.navy}`,
+                  borderRadius: '6px', cursor: 'pointer', marginBottom: '0.75rem',
+                  fontFamily: "'JetBrains Mono', monospace", fontSize: '0.82rem', fontWeight: 500,
+                }}>
+                  <Send size={16} /> Send a message →
+                </button>
                 {[
-                  { Icon: Mail,     label: 'Email',    value: 'bramara.thogarcheti@gmail.com', href: 'mailto:bramara.thogarcheti@gmail.com' },
                   { Icon: Github,   label: 'GitHub',   value: 'github.com/bmt3755',            href: 'https://github.com/bmt3755' },
                   { Icon: Linkedin, label: 'LinkedIn', value: 'linkedin.com/in/bmt-humane-ai', href: 'https://linkedin.com/in/bmt-humane-ai' },
-                ].map(({ Icon, label, value, href }) => {
-                  const ext = href.startsWith('http')
-                  return (
-                    <a key={label} href={href}
-                      target={ext ? '_blank' : undefined}
-                      rel={ext ? 'noopener noreferrer' : undefined}
-                      className="contactrow"
-                      style={{
-                        display: 'flex', alignItems: 'center', gap: '0.9rem',
-                        padding: '0.95rem 0.5rem', borderBottom: `1px solid ${C.borderLight}`,
-                        textDecoration: 'none', color: C.ink,
-                      }}>
-                      <Icon size={18} color={C.navy} strokeWidth={1.6} />
-                      <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <Mono style={{ fontSize: '0.58rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: C.inkFaint }}>{label}</Mono>
-                        <Mono style={{ fontSize: '0.82rem', color: C.ink }}>{value}</Mono>
-                      </span>
-                      <ArrowUpRight size={15} color={C.inkFaint} style={{ marginLeft: 'auto' }} />
-                    </a>
-                  )
-                })}
+                ].map(({ Icon, label, value, href }) => (
+                  <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="contactrow" style={{
+                    display: 'flex', alignItems: 'center', gap: '0.9rem',
+                    padding: '0.95rem 0.5rem', borderBottom: `1px solid ${C.borderLight}`,
+                    textDecoration: 'none', color: C.ink,
+                  }}>
+                    <Icon size={18} color={C.navy} strokeWidth={1.6} />
+                    <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      <Mono style={{ fontSize: '0.58rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: C.inkFaint }}>{label}</Mono>
+                      <Mono style={{ fontSize: '0.82rem', color: C.ink }}>{value}</Mono>
+                    </span>
+                    <ArrowUpRight size={15} color={C.inkFaint} style={{ marginLeft: 'auto' }} />
+                  </a>
+                ))}
               </div>
             </div>
 
@@ -979,6 +992,8 @@ export default function Home() {
           </motion.div>
         </div>
       )}
+
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} c={C} />
 
       </div>
     </div>
